@@ -1,0 +1,61 @@
+version: '2'
+
+services:
+
+  mysql:
+    image: mysql:8.0
+    ports:
+     - 3306:3306
+    environment:
+     - MYSQL_ROOT_PASSWORD=debezium
+     - MYSQL_USER=mysqluser
+     - MYSQL_PASSWORD=mysqlpw
+     - MYSQL_DATABASE=inventory
+    volumes:
+     - ./mysql-init:/docker-entrypoint-initdb.d
+
+  zookeeper:
+    image: quay.io/debezium/zookeeper:3.0
+    ports:
+     - 2181:2181
+     - 2888:2888
+     - 3888:3888
+    volumes:
+     - ./data/zookeeper/data:/zookeeper/data
+     - ./data/zookeeper/txns:/zookeeper/txns
+     - ./data/zookeeper/logs:/zookeeper/logs
+ 
+  kafka:
+    image: quay.io/debezium/kafka:3.0
+    ports:
+     - 9092:9092
+    links:
+     - zookeeper
+    environment:
+     - ZOOKEEPER_CONNECT=zookeeper:2181
+    volumes:
+     - ./data/kafka/data:/kafka/data
+     - ./data/kafka/logs:/kafka/logs
+
+  connect:
+    image: quay.io/debezium/connect:3.0
+    ports:
+     - 8083:8083
+    links:
+     - kafka
+     - mysql
+     - elasticsearch
+    environment:
+     - BOOTSTRAP_SERVERS=kafka:9092
+     - GROUP_ID=1
+     - CONFIG_STORAGE_TOPIC=my_connect_configs
+     - OFFSET_STORAGE_TOPIC=my_connect_offsets
+     - STATUS_STORAGE_TOPIC=my_connect_statuses
+ 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.7.0
+    ports:
+     - 9200:9200
+    environment:
+     - discovery.type=single-node
+     - xpack.security.enabled=false
