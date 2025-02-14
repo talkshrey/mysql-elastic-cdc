@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule } from './config/config.module';
 import { ElasticModule } from './db/elastic/elastic.module';
 import { MysqlModule } from './db/mysql/mysql.module';
+import { ConfigModule } from '@nestjs/config';
+
+void ConfigModule.forRoot();
 
 @Module({
-  imports: [ConfigModule, ElasticModule, MysqlModule],
+  imports: [ElasticModule, MysqlModule],
   controllers: [AppController],
   providers: [AppService],
 })
