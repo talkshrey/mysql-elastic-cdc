@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/require-await */
 import { EachMessagePayload } from 'kafkajs';
 import { Inject, Logger } from '@nestjs/common';
 import { KafkaConsumerService } from 'src/db/kafka/kafkaConsumer.service';
@@ -14,7 +15,14 @@ export default class ElasticDBConsistencyOnEntityUpdateKafkaConsumer {
         'dbserver1.inventory.orders',
       ];
 
-      await this.kafkaConsumerService.consume({ topics: kafkaTopics }, '', {});
+      await this.kafkaConsumerService.consume({ topics: kafkaTopics }, '', {
+        eachMessage: async (params) => {
+          const { topic, key, value } = this.messageParser(params);
+          Logger.log(
+            `Listening to kafka on topic ${topic}, result -> key: ${key}, value: ${value}`,
+          );
+        },
+      });
     } catch (error) {
       Logger.error(`Error while listening to kafka's consumer: ${error} `);
     }
@@ -24,22 +32,18 @@ export default class ElasticDBConsistencyOnEntityUpdateKafkaConsumer {
     topic: string;
     key: string | undefined;
     value: string | undefined;
-  } | void {
+  } {
     Logger.log(
       `Kafka order processing message parser logs, topic: ${topic}, partition: ${partition}`,
     );
-    try {
-      const value = message.value?.toString();
-      Logger.log(
-        `Kafka order processing consumer message value logs without parse: ${value}`,
-      );
-      return {
-        topic,
-        key: message.key?.toString(),
-        value,
-      };
-    } catch (error) {
-      Logger.error(`Error while parsing message: ${error}`);
-    }
+    const value = message.value?.toString();
+    Logger.log(
+      `Kafka order processing consumer message value logs without parse: ${value}`,
+    );
+    return {
+      topic,
+      key: message.key?.toString(),
+      value,
+    };
   }
 }
