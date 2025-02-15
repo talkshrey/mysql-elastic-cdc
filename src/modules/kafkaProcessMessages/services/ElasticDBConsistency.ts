@@ -15,14 +15,20 @@ export default class ElasticDBConsistencyOnEntityUpdateKafkaConsumer {
         'dbserver1.inventory.orders',
       ];
 
-      await this.kafkaConsumerService.consume({ topics: kafkaTopics }, '', {
-        eachMessage: async (params) => {
-          const { topic, key, value } = this.messageParser(params);
-          Logger.log(
-            `Listening to kafka on topic ${topic}, result -> key: ${key}, value: ${value}`,
-          );
+      console.log('Listening to kafka consumer');
+
+      await this.kafkaConsumerService.consume(
+        { topics: kafkaTopics },
+        'shrey1-2',
+        {
+          eachMessage: async (params) => {
+            const { topic, key, value } = this.messageParser(params);
+            Logger.log(
+              `Listening to kafka on topic ${topic}, result -> key: ${key}, value: ${value}`,
+            );
+          },
         },
-      });
+      );
     } catch (error) {
       Logger.error(`Error while listening to kafka's consumer: ${error} `);
     }

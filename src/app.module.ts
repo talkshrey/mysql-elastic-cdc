@@ -6,6 +6,7 @@ import { MysqlModule } from './db/mysql/mysql.module';
 import { ConfigModule } from '@nestjs/config';
 import { KafkaModule } from './db/kafka/kafka.module';
 import { ElasticsearchModule } from '@nestjs/elasticsearch';
+import { ReadKafkaMessagesModule } from './modules/kafkaProcessMessages/readKafkaMessages.module';
 
 void ConfigModule.forRoot();
 
@@ -20,6 +21,7 @@ void ConfigModule.forRoot();
     ElasticModule,
     MysqlModule,
     KafkaModule,
+    ReadKafkaMessagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
