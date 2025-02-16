@@ -1,12 +1,12 @@
 SELECT 
-    o.id AS order_id,
+    o.id as order_id,
     o.user_id,
-    u.name AS user_name,
-    u.email AS user_email,
+    u.user_name,
+    u.user_email,
     o.product_id,
-    p.name AS product_name,
-    p.price AS product_price,
-    o.quantity,
+    p.product_name,
+    p.product_price,
+    o.order_quantity,
     o.order_date
 FROM orders o
 LEFT JOIN users u ON o.user_id = u.id 
