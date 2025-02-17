@@ -1,15 +1,16 @@
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { KafkaModule } from 'src/db/kafka/kafka.module';
-import ElasticDBConsistencyOnEntityUpdateKafkaConsumer from './services/ElasticDBConsistency';
+import ReadKafkaMessagesService from './readKafkaMessages.service';
+import { ElasticModule } from 'src/db/elastic/elastic.module';
 
 @Module({
-  imports: [ConfigModule, KafkaModule],
-  providers: [ElasticDBConsistencyOnEntityUpdateKafkaConsumer],
+  imports: [ConfigModule, KafkaModule, ElasticModule],
+  providers: [ReadKafkaMessagesService],
 })
 export class ReadKafkaMessagesModule implements OnModuleInit {
   constructor(
-    private elasticDbConsistencyOnEntityUpdate: ElasticDBConsistencyOnEntityUpdateKafkaConsumer,
+    private elasticDbConsistencyOnEntityUpdate: ReadKafkaMessagesService,
   ) {}
 
   onModuleInit() {
